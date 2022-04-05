@@ -1,0 +1,181 @@
+#lang racket
+
+(define x 2)
+(define a 10)
+
+
+; ---------------------- SCOPING ---------------------- 
+(define (f1 x y) (+ x y))
+;(f1 3 3)
+;(f1 x 3)
+;(f1 x y)
+
+(define (f2 x z) (+ x z))
+;(f2 4 4)
+;(f2 a 4)
+;(f2 1 z)
+
+(define (f3 x y) (+ a x y))
+;(f3 1 1)
+
+(define (f4 x y) (f3 a x))
+;(f4 1 1)
+;(f4 x 1)
+;(f4 a a)
+
+;(+ x y) ; y not in scope / unbound y
+;(+ a x)
+
+
+
+; ---------------------- BINDING ----------------------
+
+(define my-val 5)
+;my-val
+
+(define (f5 my-val) my-val)
+;(f5 8)
+
+(define (f6 x) my-val)
+;(f6 1)
+
+
+
+; ---------------------- LET ----------------------
+
+;(let ((x 2) (y 3)) (list x y))
+
+
+(define (g1 x y)
+  (let ([x 2] [y 3])
+    (list x y)
+    (+ x y)))
+
+;(g1 5 6)
+
+(define (g2 x y)
+  (let ([x 4] [y (+ x 1)])
+  (list x y)))
+
+;(g2 3 5)
+
+(define (f x y)
+  (let ((x 2) (y 3)) (list x y))
+  (list x y))
+
+;(f 5 6)
+
+
+;(let ([a 1])
+;  (let ([a 2]) (print a)) )
+;
+;
+;(display "\n")
+;
+;(let ([a 1])
+;  (let ([a 2])
+;  (let ([f (λ () (print a))])
+;  (f))))
+;
+;(display "\n")
+;
+;(let ([a 1])
+;  (let ([f (λ () (print a))])
+;  (let ([a 2])
+;  (f))))
+;
+;(display "\n")
+
+
+;------------ STATIC vs DYNAMIC BINDING -------------
+
+;(let ([y 3])
+; (let ([f (λ (x) (+ x y))])
+; (let ([y 17])
+; (f 2))))
+
+; care ar fi fost rezultatul cu dynamic binding?
+
+
+; -------------- LET* -------------------
+
+;(let ([x 5] [y (+ x 1)]) (list x y))
+;(let* ([x 5] [y (+ x 1)]) (list x y))
+
+
+; ------------ LETREC --------------------
+
+;(let ([fact (λ (n)
+;              (if (<= n 1) n
+;                  (* n (fact (- n 1)))))])
+;  (fact 5))
+
+;(letrec ([fact (λ (n)
+;              (if (<= n 1) n
+;                  (* n (fact (- n 1)))))])
+;  (fact 5))
+
+
+;(letrec ([x y]
+;         [y 2])
+;  y)
+
+; ------------ NAMED LET --------------
+; ne ajuta sa scriem loops, functii recursive pe coada
+; ne ajuta sa definim un local helper (helper function) in interiorul altei functii
+
+;(let fac ([n 5])
+;    (if (zero? n)
+;        1
+;        (* n (fac (sub1 n)))))
+
+(define (my-filter-helper f L acc)
+  (cond
+    [(null? L) (reverse acc)]
+    [(f (car L)) (my-filter-helper f (cdr L) (cons (car L) acc))]
+    [else (my-filter-helper f (cdr L) acc)]))
+
+(define (my-filter f L)
+  (my-filter-helper f L '()))
+
+;(my-filter odd? '(1 2 3 4 5 6 7))
+
+
+(define (my-filter-let f L)
+  (let filter-helper ([L L] [acc '()])
+    (cond
+      [(null? L) (reverse acc)]
+      [(f (car L)) (filter-helper (cdr L) (cons (car L) acc))]
+      [else (filter-helper (cdr L) acc)])))
+
+
+;(my-filter-let odd? '(1 2 3 4 5 6 7))
+
+
+; ------- SPLITF-AT + LET*-VALUES ---------
+
+;(splitf-at '(1 3 4 5 6) odd?) ; takes element as long as pred is satisfied
+;(let*-values (((odd rest1) (splitf-at '(1 3 4 5 6) odd?))
+;              ((even rest2) (splitf-at '(1 3 4 5 6) even?)))
+;  (list odd even rest1 rest2))
+
+
+; --------- INCHIDERE FUNCTIONALA ---------
+
+(define func (λ (x y) (list x y))) ; inchidere functionala
+;(func 2 3)                         ; aplicare ; in contextul global
+
+(define (func2 x)
+  (define func3
+    (λ (x y) (+ x y a)))           ; inchidere functionala
+  (func3 x 1))                     ; aplicare ; in contextul lui func2 (x 2)
+
+;(func2 2)                          ; aplicare ; in contextul global (a 10)
+
+; exemplu reluat cu let
+(define (func4 x)
+  (let ([func3 (λ (x y) (+ x y a))])
+    (func3 x 1)))
+
+;(func4 2)
+
