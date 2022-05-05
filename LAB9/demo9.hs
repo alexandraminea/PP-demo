@@ -34,7 +34,7 @@ lookup_  key ((x,y):xys)
 
 ------------------------------------------------------- CLASE --------------------------------------------------
 
-data Person = Person {firstName :: String, lastName :: String}
+data Person = Person {firstName :: String, lastName :: String} deriving Show
 p1 = Person "Buddy" "Finklestein"
 p2 = Person {firstName = "Buddy", lastName = "Finklestein"}
 p3 = Person "Guy" "Smith"
@@ -77,7 +77,6 @@ class Container t where
 class Invertible a where
     invert :: a -> a
     invert = id 
-
 
 data NestedList a = Elem a | List [NestedList a]
 
@@ -128,3 +127,33 @@ instance Functor NestedList where
 
 instance Container NestedList where
     contents = flatten
+
+
+-- constante polimorfice --
+
+{-
+    5 :: Num p => p
+    Numerele sunt constante polimorfice, adica ele pot avea tipuri care sunt instante ale clasei Num (Int, Integer, Float, Double)
+    Ne putem gandi ca o constanta este o functie fara parametri
+-}
+
+{-
+    one :: Constant a => a
+    five :: Constant a => a
+-}
+
+class Constant a where
+  one :: a
+  five :: a
+
+instance Constant Int where
+  one = 1
+  five = 5
+
+instance Constant Float where
+  one = 1.0
+  five = 5.0
+
+instance Constant String where
+  one = "one"
+  five = "five"
