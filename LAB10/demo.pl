@@ -2,7 +2,6 @@
 
 
 % ------------------------------------  FACTS ----------------------------------------
-
 fruit(apple).
 fruit(pear).
 fruit(orange).
@@ -151,8 +150,8 @@ is_member(X,[_|Tail]) :- is_member(X,Tail).
 % lungimea listei vide este 0
 length_of([], 0).
 % lungimea listei nevide este N daca lungimea lui Tail este N1 si N = N1 + 1
-length_of([_|Tail], N) :- 
-    length_of(Tail, N1), 
+length_of([_|Tail], N) :-
+    length_of(Tail, N1),
     N is N1 + 1.
 
 % [trace] 26 ?- length_of([1, 2, 3], X).
@@ -233,3 +232,5 @@ factorial(N, NFact) :-
     factorial(Nminus1, Nminus1Fact),
     NFact is Nminus1Fact * N.
 
+myReverseAcc([], L, L).
+myReverseAcc([H|T],A,L):- myReverseAcc(T,[H|A],L).
