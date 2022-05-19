@@ -165,8 +165,6 @@ rain(romania).
 rain(austria).
 rain(germany).
 
-% How can you prove something doesn't generally hold? => we find a counter-example
-
 % This predicate figures out if it rains somewhere(fail) / nowhere(succeed).
 % NOT where it doesn't rain.
 no_rain(X) :- \+ rain(X).
@@ -225,15 +223,7 @@ believes(john, likes(mary, apples)).
 % findall(X, member(X, [1,2,3]), L), length(L, N).
 
 
-% ------------------------------------------------- FORALL ------------------------------------------------------
-
-/*
-    forall(Condition, Action):
-        - succeeds if for all alternative bindings of Condition, Action can be proven
-        - fails if there is at least one alternative binding of Condition, for which Action can't be proven
-*/
-
-% L1 = [1,2,3], L2 = [1,2], forall(member(X,L1), member(X, L2)).
+% ------------------------------------------------- DOUBLE NEGATION ------------------------------------------------------
 
 % double negation -> \+ \+ Goal <=> Goal can be proven
 
@@ -256,9 +246,38 @@ p(X) :- \+ (q(X), member(X, [1,2,3])).
 % for all X for which q(X) holds, member(X, [1,2,3]) holds.
 p1(X) :- \+ (q(X), \+ member(X,[1,2,3])).
 
+% ------------------------------------------------- FORALL ------------------------------------------------------
+
+/*
+    forall(Condition, Action):
+        - succeeds if for all alternative bindings of Condition, Action can be proven
+        - fails if there is at least one alternative binding of Condition, for which Action can't be proven
+*/
+
 % There is no instantiation of Cond for which Action can't be proven
 foralll(Cond, Action) :- \+ (Cond, \+ Action).
 
+% check if all members of [1,2,3] are in [1,2,3,4] too
+% foralll(member(X,[1,2,3]), member(X,[1,2,3,4])).
+% L1 = [1,2,3], L2 = [1,2], forall(member(X,L1), member(X, L2)).
 
-template([1/1/_, 1/2/_, 1/3/_, 2/1/_, 2/2/_, 2/3/_, 3/1/_, 3/2/_, 3/3/_]).
+% forall -> all members in [1,2,3] are in [1,2,3,4] too
+% negation -> there is at least one member in [1,2,3] which IS NOT in [1,2,3,4]
+p2(X) :- \+ forall(member(X,[1,2,3]), member(X,[1,2,3,4])).
 
+% negate the Action -> there is at least one member in [1,2,3] which IS in [1,2,3,4]
+p3(X) :- \+ forall(member(X,[1,2,3]), \+ member(X,[1,4])).
+
+p4(X) :- \+ \+ (member(X,[1,2,3]), member(X,[1,4])).
+
+foranyy(Cond, Action) :- \+ forall(Cond, \+ Action).
+
+% foranyy(member(X,[1,2,3]), member(X,[1,4])).
+
+prime(2).
+prime(N) :-
+    between(3, inf, N),
+    1 is N mod 2,
+    M is floor(sqrt(N+1)),
+    Max is (M-1) // 2,
+    forall( between(1, Max, I), N mod (2*I+1) > 0 ).
